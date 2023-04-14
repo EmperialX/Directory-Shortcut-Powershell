@@ -1,78 +1,63 @@
-#!/usr/bin/env python
 import os
 import subprocess
 
+
 def install_powershell_functions():
-    # Define the PowerShell code to install the functions
-    powershell_code = r'''
-    function shortme ($shortcutName) {
+    # Create the WindowsPowerShell directory if it doesn't exist
+    powershell_directory = os.path.join(os.path.expanduser("~"), 'Documents', 'WindowsPowerShell')
+    if not os.path.exists(powershell_directory):
+        os.makedirs(powershell_directory)
+        print(f"Created directory '{powershell_directory}'")
+
+    # Define the PowerShell code to set the execution policy and install the functions
+powershell_code = fr'''
+    Start-Process powershell -Verb RunAs -ArgumentList "-Command", "Set-ExecutionPolicy RemoteSigned"
+    Write-Host "Please type Y and press Enter to confirm the change of the execution policy. Afterward, close and reopen PowerShell."
+    pause > $null
+
+    function shortme ($shortcutName) {{
         $shortcutPath = "$env:USERPROFILE\shortcuts\$shortcutName.txt"
         $currentDirectory = Get-Location
         New-Item -ItemType File -Path $shortcutPath -Value $currentDirectory
         Write-Host "Shortcut '$shortcutName' created. Use 'runme $shortcutName' to change to this directory in future sessions."
-    }
+    }}
 
-    function runme ($shortcutName) {
+    function runme ($shortcutName) {{
         $shortcutPath = "$env:USERPROFILE\shortcuts\$shortcutName.txt"
         $shortcutDirectory = Get-Content $shortcutPath
         Set-Location $shortcutDirectory
-    }
+    }}
 
-    Add-Content $PROFILE "`nfunction shortme { param(`$shortcutName) `$shortcutPath = `"$env:USERPROFILE\shortcuts\\`$shortcutName.txt`"; `$currentDirectory = Get-Location; New-Item -ItemType File -Path `$shortcutPath -Value `$currentDirectory; Write-Host `"`nShortcut '$shortcutName' created. Use 'runme `$shortcutName' to change to this directory in future sessions.`" }"
-    Add-Content $PROFILE "`nfunction runme { param(`$shortcutName) `$shortcutPath = `"$env:USERPROFILE\shortcuts\\`$shortcutName.txt`"; `$shortcutDirectory = Get-Content `$shortcutPath; Set-Location `$shortcutDirectory }" 
+    Add-Content $PROFILE "`nfunction shortme {{ param(`$shortcutName) `$shortcutPath = `"$env:USERPROFILE\shortcuts\\`$shortcutName.txt`"; `$currentDirectory = Get-Location; New-Item -ItemType File -Path `$shortcutPath -Value `$currentDirectory; Write-Host `"`nShortcut '$shortcutName' created. Use 'runme `$shortcutName' to change to this directory in future sessions.`" }}" 
+    Add-Content $PROFILE "`nfunction runme {{ param(`$shortcutName) `$shortcutPath = `"$env:USERPROFILE\shortcuts\\`$shortcutName.txt`"; `$shortcutDirectory = Get-Content `$shortcutPath; Set-Location `$shortcutDirectory }}" 
 
     . $PROFILE
-    '''
 
-    # Use the subprocess module to run the PowerShell code
-    process = subprocess.Popen(['powershell.exe', '-Command', powershell_code], stdout=subprocess.PIPE)
-    output, error = process.communicate()
+'''
+# Define the help page
+help_page = f"\n{'*' * 10} QuickDir {'*' * 10}\n\n"
+help_page += "QuickDir is a PowerShell script that allows you to create shortcuts to frequently used directories and change to those directories quickly.\n\n"
+help_page += "To create a shortcut, use the 'shortme' command followed by the name of the shortcut you want to create. For example:\n\n"
+help_page += "    shortme myshortcut\n\n"
+help_page += "This will create a shortcut named 'myshortcut' that points to the current directory.\n\n"
+help_page += "To change to a directory using a shortcut, use the 'runme' command followed by the name of the shortcut. For example:\n\n"
+help_page += "    runme myshortcut\n\n"
+help_page += "This will change to the directory associated with the 'myshortcut' shortcut.\n\n"
 
-    # Print the output and error messages
-    if output:
-        print(output.decode('utf-8'))
-    if error:
-        print(error.decode('utf-8'))
+# Display the help page
+print(help_page)
 
-    # Define the help page
-    help_page = r'''
-    ***********************************************************************
-    *                                                                     *
-    *                                                                     *
-    *                             QuickDir                                *
-    *                       PowerShell Functions                         *
-    *                                                                     *
-    *                                                                     *
-    ***********************************************************************
 
-    DESCRIPTION:
-        QuickDir is a set of PowerShell functions that allows you to create and
-        manage shortcuts to frequently used directories.
+# Use the subprocess module to run the PowerShell code
+process = subprocess.Popen(['powershell.exe', '-Command', powershell_code], stdout=subprocess.PIPE)
+output, error = process.communicate()
 
-    FUNCTIONS:
-        - shortme
-            Creates a new shortcut to the current directory.
+# Print the output and error messages
+if output:
+    print(output.decode('utf-8'))
+if error:
+    print(error.decode('utf-8'))
 
-        - runme
-            Changes to the directory specified by the given shortcut.
 
-    USAGE:
-        To create a new shortcut, use the following command:
-            shortme shortcutName
-
-        To change to a directory specified by a shortcut, use the following command:
-            runme shortcutName
-
-    EXAMPLES:
-        To create a shortcut called 'work' for the current directory, use the following command:
-            PS C:\Users\JohnDoe> shortme work
-
-        To change to the directory specified by the 'work' shortcut, use the following command:
-            PS C:\Users\JohnDoe> runme work
-
-    For more information, visit https://github.com/yourusername/quickdir
-    '''
-
-    # Print the help page
-    print(help_page)
-
+# Call the function to install the PowerShell functions
+install_powershell_functions()
