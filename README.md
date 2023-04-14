@@ -36,12 +36,7 @@ cd QuickDir-Powershell
 
 ```
 
-Run the following command to install the required Python libraries:
-```
-pip install -r requirements.txt
-
-```
-
+### Install
 Run the following command to install the PowerShell functions:
 ```
 python install_functions.py
@@ -108,9 +103,7 @@ powershell-directory-shortcuts/
 ├── check_status.py
 ├── install_functions.py
 ├── uninstall_functions.py
-├── requirements.txt
 ├── LICENSE
-├── NOTICE
 └── shortcuts/
     ├── MyShortcut.txt
     ├── AnotherShortcut.txt
