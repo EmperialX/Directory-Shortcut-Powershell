@@ -44,7 +44,31 @@ python install_functions.py
 ```
 This will create two PowerShell functions named shortme and runme that you can use to create and manage directory shortcuts.
 
+## add_module_to_env.py
 
+This Python script helps to add the quickdir PowerShell module to your system environment variables without having to edit the code. Instead, it prompts you to enter the directory path and confirms with you before making any changes.
+
+To use this script, follow these steps:
+
+Download the `add_module_to_env.py` file from this repository and save it to your desired location.
+
+Open your command prompt or terminal and navigate to the directory where you saved the file.
+
+
+   Run the following command:
+```
+python add_module_to_env.py
+```
+
+The script will prompt you to enter the directory path where the quickdir PowerShell module is located. The directory should look like this: `C:\Users\ASUS\shortcuts\powershell-directory-shortcuts`.
+
+Once you enter the directory path, the script will ask for confirmation. Enter `"y"` for yes or `"n"` for no.
+
+If you enter `"y"`, the script will check if the directory path is already in your system environment variables. If it's not, it will add the path to your system environment variables.
+
+After the changes are made, the script will remind you to restart your command prompt or terminal for the changes to take effect.
+
+That's it! Now you can use the quickdir PowerShell module without any issues.
 
 ## Usage
 
