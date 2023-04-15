@@ -1,26 +1,38 @@
 #!/usr/bin/env python
 import os
 
-# Define a function to remove the shortcut files
-def remove_shortcut(shortcut_name):
-    shortcut_path = os.path.expanduser(f"~/shortcuts/{shortcut_name}.txt")
-    os.remove(shortcut_path)
-    print(f"Shortcut '{shortcut_name}' removed.")
+def uninstall_powershell_functions():
+    # Define the PowerShell code to remove the functions from the profile
+    powershell_code = fr'''
+    $functions_to_remove = @("shortme", "runme")
+    $profile_path = $PROFILE.CurrentUserAllHosts
+    $profile_content = Get-Content $profile_path
+    foreach ($function_name in $functions_to_remove) {{
+        $function_start = $profile_content.IndexOf("`nfunction $function_name (")
+        $function_end = $profile_content.IndexOf("`n`n", $function_start)
+        if ($function_start -ge 0 -and $function_end -ge 0) {{
+            $function_length = $function_end - $function_start
+            $profile_content.Remove($function_start, $function_length)
+        }}
+    }}
+    Set-Content $profile_path $profile_content
+    Write-Host "PowerShell functions removed from user profile.'''
 
-# Define a function to remove the PowerShell functions from the profile
-def remove_shortme_runme():
-    profile_path = os.path.expanduser("~/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1")
-    with open(profile_path, "r") as f:
-        lines = f.readlines()
-    new_lines = [l for l in lines if "shortme" not in l and "runme" not in l]
-    with open(profile_path, "w") as f:
-        f.writelines(new_lines)
-    print("PowerShell functions removed from the profile.")
+    # Display a message to the user
+    print("\n" + "*" * 10 + " QuickDir " + "*" * 10 + "\n")
+    print("QuickDir has been uninstalled from your system. The PowerShell functions that it added to your user profile have been removed.\n")
+    print("The shortcuts that you created with QuickDir have not been deleted. You can remove them manually if you no longer need them.\n")
 
-# Remove the functions and shortcut files
-remove_shortcut("MyShortcut")
-remove_shortme_runme()
+    # Get the absolute path of the script file and remove it
+    script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "quickdir.ps1"))
+    os.remove(script_path)
 
-# Print a thank you message
-print("Thank you!")
+    # Use the os module to remove the shortcuts directory
+    shortcuts_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "shortcuts"))
+    os.rmdir(shortcuts_dir)
+
+    print("QuickDir script and shortcuts directory removed.")
+
+# Call the function to uninstall the PowerShell functions
+uninstall_powershell_functions()
 
